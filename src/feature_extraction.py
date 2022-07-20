@@ -109,9 +109,9 @@ def generate_features(url):
         new_url = url.replace('www.', '')
     else:
         new_url = url
-    public_suffix = get_public_suffix(new_url)
-    for suffix in public_suffix:
-        new_url = new_url.replace(suffix, '')
+    #public_suffix = get_public_suffix(new_url)
+    #for suffix in public_suffix:
+    #    new_url = new_url.replace(suffix, '')
 
     sub_domains = len(re.findall("\.", new_url))
     if sub_domains == 1:

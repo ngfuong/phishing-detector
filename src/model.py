@@ -31,7 +31,7 @@ def get_prediction(url, model):
     """
     features = generate_features(url)
     if features is False:
-        return False
+        return "Malicious"
     else:
         score = predict_single(features, model)
         classes = ["Malicious", "Benign"]
