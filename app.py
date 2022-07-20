@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template
 
-from model import load_model_from_checkpoint, get_prediction 
+from src.model import load_model_from_checkpoint, get_prediction 
 
 
 app = Flask(__name__)
@@ -20,7 +20,7 @@ def predict():
 
 if __name__ ==  "__main__":
     # load model at creation time
-    model = load_model_from_checkpoint(path='./rforest.pkl')
+    model = load_model_from_checkpoint(path='./src/rforest.pkl')
     print("Model loaded!")
     app.run(port=5000, debug=True)
 

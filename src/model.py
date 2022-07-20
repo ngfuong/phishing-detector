@@ -2,7 +2,7 @@ import pickle
 import json
 import argparse
 import numpy as np
-from feature_extraction import generate_features, features_to_dict 
+from src.feature_extraction import generate_features, features_to_dict 
 
 
 def load_model_from_checkpoint(path="rforest.pkl"):
