@@ -12,11 +12,11 @@ from dateutil.parser import parse as date_parse
 import whois
 import ipaddress
 import googlesearch
+from publicsuffix2 import get_public_suffix
 
 
 def generate_features(url):
     """
-    index,
     having_IP_Address,
     URL_Length,
     Shortining_Service,
@@ -98,22 +98,31 @@ def generate_features(url):
     record.append(-1 if re.findall("@", url) else 1)
 
     # 5. double_slash_redirecting
-    list = [x.start(0) for x in re.finditer('//', url)]
-    record.append(-1 if len(list)-1 > 6 else 1)
+    double_slashes = [x.start(0) for x in re.finditer('//', url)]
+    record.append(-1 if len(double_slashes)-1 > 6 else 1)
 
     # 6. Prefix_Suffix
     record.append(-1 if re.findall(r"https?://[^\-]+-[4^\-]+$", url) else 1)
 
-    # 7. having_Sub_Domain
-    sub_domains = len(re.findall("\.", url))
+    # 7. having_Sub_Domain | dots in domain
+    if 'www.' in url:
+        new_url = url.replace('www.', '')
+    else:
+        new_url = url
+    public_suffix = get_public_suffix(new_url)
+    for suffix in public_suffix:
+        new_url = new_url.replace(suffix, '')
+
+    sub_domains = len(re.findall("\.", new_url))
     if sub_domains == 1:
         record.append(1)
-    elif sub_domains == 2:
+    elif sub_domains > 2:
         record.append(0)
     else:
-        record.append(-1)
+        record.append(1)
     
     # 8. SSLfinal_State
+    #TODO: fix this
     try: 
         if response.text:
             record.append(1)
@@ -150,6 +159,7 @@ def generate_features(url):
             pass
     
     # 11. port
+    #TODO: check port preferred status
     try:
         port = domain.split(":")[1]
         record.append(-1 if port else 1)
@@ -157,7 +167,12 @@ def generate_features(url):
         record.append(1)
 
     # 12. HTTPS_token
-    record.append(1 if re.findall(r"^https://", url) else -1)
+    if 'https' in url:
+        if url.startswith('https://'):
+            no_https = re.findall(r"https", url)
+            record.append(1 if len(no_https)==1 else -1)
+    else:
+        record.append(1)
 
     # 13. Request_URL
     i = 0
@@ -190,10 +205,10 @@ def generate_features(url):
             i = i+1
 
         try:
-            percentage = success/float(i) * 100
-            if percentage < 22.0:
+            percentage = success/float(i)
+            if percentage < 0.22:
                 record.append(1)
-            elif percentage > 61.0:
+            elif percentage > 0.61:
                 record.append(-1)
             else:
                 record.append(0)
@@ -215,13 +230,13 @@ def generate_features(url):
             i = i + 1
 
         try:
-            percentage = unsafe / float(i) * 100
+            percentage = unsafe / float(i)
         except:
             record.append(1)
 
-        if percentage < 31.0:
+        if percentage < 0.31:
             record.append(1)
-        elif percentage < 67.0:
+        elif percentage > 0.67:
             record.append(-1)
         else:
             record.append(0)
@@ -248,13 +263,13 @@ def generate_features(url):
                 success = success + 1
             i = i+1
         try:
-            percentage = success / float(i) * 100
+            percentage = success / float(i)
         except:
             record.append(1)
 
-        if percentage < 17.0:
+        if percentage < 0.17:
             record.append(1)
-        elif percentage > 81.0:
+        elif percentage > 0.81:
             record.append(-1)
         else:
             record.append(0)
