@@ -51,7 +51,7 @@ python-dateutil==2.8.2
 pytz==2022.1
 requests @ file:///opt/conda/conda-bld/requests_1641824580448/work
 ruamel-yaml-conda @ file:///tmp/build/80754af9/ruamel_yaml_1616016711199/work
-scikit-learn==1.1.1
+scikit-learn==1.0.2
 scipy==1.8.1
 six @ file:///tmp/build/80754af9/six_1644875935023/work
 tabulate==0.8.10
